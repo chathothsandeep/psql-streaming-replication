@@ -24,10 +24,24 @@ STEP1: Configuring Primary Server
     ( /etc/postgresql/14/main/– edit postgresql.conf)
 
     listen_addresses = ‘*’ 
+
+    ![screenshot](./psql-replication-screenshots/Primary/1.png)
+
+
     2. Now, connect to PostgreSQL on the primary server and create a replica login.
 
     CREATE USER repl_user WITH REPLICATION ENCRYPTED PASSWORD ‘repl_pass’;
     3. Enter the following entry pg_hba.conf file which is located in /etc/postgresql/14/main.
 
     host replication repl_user 192.168.1.5/24 md5
-    
+
+    4. Now, restart the PostgreSQL on the Primary server by using the below command.
+
+    sudo systemctl restart postgresql
+
+    Check systemctl status postgresql@14-main.service, whether it’s working or not.
+
+STEP2: Configurations on standby server:
+    1. Create a directory ( /opt/psql-replication) where the database will be replicated from the primary server. (In a production environment, the replication data should be stored on external or attached storage for fault tolerance.)
+    2. Edit postgresql.conf and mark /opt/psql-replication as default directory.
+
