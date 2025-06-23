@@ -36,11 +36,89 @@ STEP1: Configuring Primary Server
 
     4. Now, restart the PostgreSQL on the Primary server by using the below command.
 
-    sudo systemctl restart postgresql
+        sudo systemctl stop postgresql.service
 
     Check systemctl status postgresql@14-main.service, whether it’s working or not.
 
 STEP2: Configurations on standby server:
     1. Create a directory ( /opt/psql-replication) where the database will be replicated from the primary server. (In a production environment, the replication data should be stored on external or attached storage for fault tolerance.)
+
     2. Edit postgresql.conf and mark /opt/psql-replication as default directory.
 
+    3. We have to stop PostgreSQL on the Standby server by using the following command.
+
+        sudo systemctl stop postgresql.service
+
+    4. Now, switch to the postgres user and take a backup of the main data directory.
+
+       Note: This step is required if you want to replicate to a different directory, such as /opt/psql-replication, rather than the system’s default data path.
+       
+       sudo -i -u postgres
+       cp -r /var/lib/postgresql/14/main/ /var/lib/postgresql/14/main_old/
+
+    Now, remove the contents of the main(data) directory on the standby server.
+
+       rm -rf /var/lib/postgresql/14/main/
+
+    5. Now, use basebackup to take the base backup with the right ownership with postgres(or any user with right permissions).
+     
+       pg_basebackup -h 192.168.1.4 -D  /opt/psql-replication -U repl_user -P -v -R -X stream -C -S slaveslot1
+    
+    6. Important : the backup directory should be owned by postgres user 
+
+    In our case please use the following commands.
+
+       sudo chown -R postgres:postgres /opt/psql-replication
+
+       sudo chmod 700  /opt/psql-replication
+
+    7. Check the directory where the replication is done.
+
+    8. Login to psql from primary server
+
+       Use below mentioned command to check slaveslot1 is created or not.
+
+       SELECT * FROM pg_replication_slots;
+    
+       Note: If you want to remove slaveslot1, use the following command.
+
+       SELECT pg_drop_replication_slot(‘slaveslot1’);
+
+    9. Login to psql from replica server
+
+       Notice that standby.signal is created and the connection settings are appended to postgresql.auto.conf.
+
+    A replication slave will run in “Hot Standby” mode if the hot_standby parameter is set to on (the default value) in postgresql.conf and there is a standby.signal file present in the data directory.
+
+STEP3. Test replication setup
+    10. Now start PostgreSQL on a standby server.
+
+    sudo systemctl start postgresql
+
+    Note : Make sure postgresql@42-main.service should be running properly.
+
+    11. Now, try to create an object or database in a replica standby server. It throws an error, because replica(standby) is a read-only server.
+
+    create database test1;
+
+    Note: standby should not allow us to create any DB, because it is in read only mode.
+
+    12. We can check the status on standby using the below command.
+
+    SELECT * FROM pg_stat_wal_receiver;
+
+    13. Now, verify the replication type synchronous or asynchronous using below command on primary database server.
+
+    SELECT * FROM pg_stat_replication;
+
+    14. Create new DB in primary server for testing
+
+    CREATE DATABASE test1;
+
+    List the DB using the following command.
+
+    \l
+
+    15. Login to the standby server.
+
+    Check DB is replicated or not.
