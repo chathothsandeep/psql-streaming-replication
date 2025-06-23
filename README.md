@@ -25,7 +25,7 @@ STEP1: Configuring Primary Server
 
     listen_addresses = ‘*’ 
 
-    ![Primary Screenshot](psql-replication-screenshots/Primary/1.png)
+    ![screenshot-1](psql-replication-screenshots/Primary/1.png)
 
     2. Now, connect to PostgreSQL on the primary server and create a replica login.
 
