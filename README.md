@@ -160,5 +160,6 @@ STEP3. Test replication setup
 
 ![screenshot-18](psql-replication-screenshots/standby/15.png)
 
-
+----------------
 SANDEEP CHATHOTH
+----------------
