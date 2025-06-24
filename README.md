@@ -71,7 +71,7 @@ STEP2: Configurations on standby server:
        sudo -i -u postgres
        cp -r /var/lib/postgresql/14/main/ /var/lib/postgresql/14/main_old/
 
-    Now, remove the contents of the main(data) directory on the standby server.
+       Now, remove the contents of the main(data) directory on the standby server.
 
        rm -rf /var/lib/postgresql/14/main/
     
