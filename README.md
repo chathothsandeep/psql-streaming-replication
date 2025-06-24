@@ -24,29 +24,43 @@ STEP1: Configuring Primary Server
     ( /etc/postgresql/14/main/– edit postgresql.conf)
 
     listen_addresses = ‘*’ 
-![image](/psql-replication-screenshots/Primary/1.png)
+
+![screenshot-1](psql-replication-screenshots/Primary/1.png)
 
     2. Now, connect to PostgreSQL on the primary server and create a replica login.
 
     CREATE USER repl_user WITH REPLICATION ENCRYPTED PASSWORD ‘repl_pass’;
+
+![screenshot-2](psql-replication-screenshots/Primary/2.png)
+
     3. Enter the following entry pg_hba.conf file which is located in /etc/postgresql/14/main.
 
     host replication repl_user 192.168.1.5/24 md5
 
+![screenshot-3](psql-replication-screenshots/Primary/3.png)
+
     4. Now, restart the PostgreSQL on the Primary server by using the below command.
 
-        sudo systemctl stop postgresql.service
+        sudo systemctl restart postgresql.service
+    
+![screenshot-4](psql-replication-screenshots/Primary/4.png)
 
     Check systemctl status postgresql@14-main.service, whether it’s working or not.
 
 STEP2: Configurations on standby server:
     1. Create a directory ( /opt/psql-replication) where the database will be replicated from the primary server. (In a production environment, the replication data should be stored on external or attached storage for fault tolerance.)
 
+![screenshot-5](psql-replication-screenshots/standby/1.png)    
+
     2. Edit postgresql.conf and mark /opt/psql-replication as default directory.
+
+![screenshot-6](psql-replication-screenshots/standby/2.png)
 
     3. We have to stop PostgreSQL on the Standby server by using the following command.
 
         sudo systemctl stop postgresql.service
+
+![screenshot-7](psql-replication-screenshots/standby/3.png)
 
     4. Now, switch to the postgres user and take a backup of the main data directory.
 
@@ -58,10 +72,14 @@ STEP2: Configurations on standby server:
     Now, remove the contents of the main(data) directory on the standby server.
 
        rm -rf /var/lib/postgresql/14/main/
+    
+![screenshot-8](psql-replication-screenshots/standby/4.png)
 
     5. Now, use basebackup to take the base backup with the right ownership with postgres(or any user with right permissions).
      
        pg_basebackup -h 192.168.1.4 -D  /opt/psql-replication -U repl_user -P -v -R -X stream -C -S slaveslot1
+
+![screenshot-9](psql-replication-screenshots/standby/5.png)
     
     6. Important : the backup directory should be owned by postgres user 
 
@@ -71,13 +89,19 @@ STEP2: Configurations on standby server:
 
        sudo chmod 700  /opt/psql-replication
 
+![screenshot-10](psql-replication-screenshots/standby/6.png)
+
     7. Check the directory where the replication is done.
+
+![screenshot-11](psql-replication-screenshots/standby/7.png)
 
     8. Login to psql from primary server
 
        Use below mentioned command to check slaveslot1 is created or not.
 
        SELECT * FROM pg_replication_slots;
+
+![screenshot-12](psql-replication-screenshots/Primary/8.png)
     
        Note: If you want to remove slaveslot1, use the following command.
 
@@ -88,6 +112,8 @@ STEP2: Configurations on standby server:
        Notice that standby.signal is created and the connection settings are appended to postgresql.auto.conf.
 
     A replication slave will run in “Hot Standby” mode if the hot_standby parameter is set to on (the default value) in postgresql.conf and there is a standby.signal file present in the data directory.
+
+![screenshot-13](psql-replication-screenshots/standby/9.png)
 
 STEP3. Test replication setup
     10. Now start PostgreSQL on a standby server.
@@ -102,13 +128,19 @@ STEP3. Test replication setup
 
     Note: standby should not allow us to create any DB, because it is in read only mode.
 
+![screenshot-14](psql-replication-screenshots/standby/11.png)  
+
     12. We can check the status on standby using the below command.
 
     SELECT * FROM pg_stat_wal_receiver;
 
+![screenshot-15](psql-replication-screenshots/standby/12.png)
+
     13. Now, verify the replication type synchronous or asynchronous using below command on primary database server.
 
     SELECT * FROM pg_stat_replication;
+
+![screenshot-16](psql-replication-screenshots/Primary/13.png)
 
     14. Create new DB in primary server for testing
 
@@ -118,6 +150,10 @@ STEP3. Test replication setup
 
     \l
 
+![screenshot-17](psql-replication-screenshots/Primary/14.png)
+
     15. Login to the standby server.
 
     Check DB is replicated or not.
+
+![screenshot-18](psql-replication-screenshots/standby/15.png)
