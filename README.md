@@ -24,8 +24,7 @@ STEP1: Configuring Primary Server
     ( /etc/postgresql/14/main/– edit postgresql.conf)
 
     listen_addresses = ‘*’ 
-
-    ![screenshot-1](psql-replication-screenshots/Primary/1.png)
+![image](/psql-replication-screenshots/Primary/1.png)
 
     2. Now, connect to PostgreSQL on the primary server and create a replica login.
 
