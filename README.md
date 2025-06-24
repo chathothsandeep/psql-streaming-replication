@@ -11,9 +11,9 @@ Characteristics of Streaming Replication
 
 Synchronous vs. Asynchronous Replication
 
-    Asynchronous Replication: The described setup appears to be asynchronous by default unless specifically configured otherwise. This means the master server does not wait for confirmation from the standby before committing transactions, allowing for lower latency but with a risk of data loss in case of a failure before the data is replicated.
+Asynchronous Replication: The described setup appears to be asynchronous by default unless specifically configured otherwise. This means the master server does not wait for confirmation from the standby before committing transactions, allowing for lower latency but with a risk of data loss in case of a failure before the data is replicated.
 
-    Synchronous Replication: If you want to ensure no data is lost, you can configure the replication as synchronous by setting the synchronous_commit parameter on the primary server and specifying the synchronous standby names in the synchronous_standby_names parameter.
+Synchronous Replication: If you want to ensure no data is lost, you can configure the replication as synchronous by setting the synchronous_commit parameter on the primary server and specifying the synchronous standby names in the synchronous_standby_names parameter.
 
 Asynchronous Streaming Replication
 
