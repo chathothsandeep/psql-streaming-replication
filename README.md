@@ -159,3 +159,6 @@ STEP3. Test replication setup
     Check DB is replicated or not.
 
 ![screenshot-18](psql-replication-screenshots/standby/15.png)
+
+
+SANDEEP CHATHOTH
