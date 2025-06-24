@@ -1,3 +1,5 @@
+Postgresql Streaming Replication Setup:
+
 PostgreSQL Streaming Replication is a method for setting up real-time replication between a primary (master) PostgreSQL server and one or more standby (replica/slave) servers. It ensures that changes (WAL – Write-Ahead Logs) from the primary are continuously streamed to the standby, allowing it to maintain an up-to-date copy of the database for failover, read scaling, or backup purposes.
 
 Characteristics of Streaming Replication
